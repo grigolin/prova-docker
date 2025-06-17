@@ -1,0 +1,50 @@
+services:
+  web:
+    build:
+      context: .               
+      dockerfile: Dockerfile   
+    container_name: prova_web_app
+    restart: always
+    ports:
+      - "80:80"                
+    volumes:
+      - ./public:/var/www/html    
+    depends_on:
+      - mysql                  
+    networks:
+      - prova_network          
+
+  mysql:
+    image: mysql:8.0           
+    container_name: prova_mysql_db
+    restart: always
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql 
+    ports:
+      - "3306:3306"            
+    environment:               
+      MYSQL_ROOT_PASSWORD: senharoot
+      MYSQL_DATABASE: aval_acao
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+    networks:
+      - prova_network          
+
+
+  adminer:
+    image: adminer             
+    container_name: prova_adminer
+    restart: always
+    ports:
+      - "8080:8080"            
+    environment:
+      ADMINER_DEFAULT_SERVER: mysql 
+    depends_on:
+      - mysql                  
+    networks:
+      - prova_network          
+
+networks:
+  prova_network:
+    driver: bridge             
+
